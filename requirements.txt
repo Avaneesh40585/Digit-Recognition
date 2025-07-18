@@ -1,0 +1,7 @@
+python>=3.8
+torch>=1.9
+torchvision
+numpy
+matplotlib
+seaborn
+pandas
