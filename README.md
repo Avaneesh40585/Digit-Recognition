@@ -39,8 +39,8 @@ Digit-Recognition/
 ├── LICENSE
 ├── README.md                   # Project documentation (this file)
 ├── digit_recognizer.ipynb      # Full MNIST pipeline in PyTorch
-├── transfer_learning/
-│   ├── digit_recognizer_resnet50.ipynb  # Advanced transfer learning with ResNet50
+├── Transfer Learning/
+│   ├── digit_recognizer_resnet50.ipynb  # Transfer learning with ResNet50
 │   └── README.md               # Transfer learning documentation
 └── Kaggle Competition/
     ├── submissions.csv         # Prediction submission file for Kaggle
