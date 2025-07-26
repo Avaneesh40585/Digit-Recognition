@@ -39,6 +39,9 @@ Digit-Recognition/
 ├── LICENSE
 ├── README.md                   # Project documentation (this file)
 ├── digit_recognizer.ipynb      # Full MNIST pipeline in PyTorch
+├── Transfer Learning/
+│   ├── digit_recognizer_resnet50.ipynb  # Transfer learning with ResNet50
+│   └── README.md               # Transfer learning documentation
 └── Kaggle Competition/
     ├── submissions.csv         # Prediction submission file for Kaggle
     └── digit_recognizer_kaggle.ipynb # Kaggle-compatible training & inference notebook
@@ -172,8 +175,7 @@ See the [LICENSE](LICENSE) file for details.
 
 - **Ensemble Approaches**: Blend predictions from multiple models for increased robustness  
 - **Adversarial Testing**: Explore model resilience against perturbed samples  
-- **Explainability**: Integrate feature visualization tools  
-- **Transfer Learning**: Adapt to MNIST variants (e.g., **EMNIST**) or other numeral datasets  
+- **Explainability**: Integrate feature visualization tools   
 - **Advanced Augmentation**: Implement methods like **elastic distortions**, **cutout**, or **mixup**
 
 ### 🔧 How to Contribute:
