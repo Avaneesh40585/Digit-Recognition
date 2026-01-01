@@ -118,6 +118,7 @@ The model follows a VGG-style design pattern, stacking convolutional layers with
 -   **Data Augmentation:** Applies random rotations (±10°), translations (±10%), and scaling (90-110%) during training to improve generalization.
 -   **Regularization:** Uses staggered Dropout rates (0.2 to 0.35) and Label Smoothing (0.1) to prevent overfitting.
 -   **Evaluation Setup:** Includes vectorized accuracy metrics, confusion matrix generation, and visual error analysis.
+-   **Configurable Data Loading:** Centralized settings for batch_size, num_workers, and pin_memory allow users to optimize throughput for their specific hardware. (Note: Default settings are pre-tuned for Apple Silicon M3 Pro efficiency).
 
 ---
 
@@ -177,12 +178,19 @@ This project requires Python 3.10 or higher.
 
 ## Usage
 
-1.  **Launch Jupyter Lab:**
+1.  **Download Pre-trained Weights (Optional):**
+    If you prefer to skip training and use the pre-trained model immediately:
+    * Go to the **[Releases](https://github.com/Avaneesh40585/Digit-Recognition/releases)** section of this repository.
+    * Download the `CNN_best_model.pth` file.
+    * Place it in the **root directory** of the project (`Digit-Recognition/`).
+    * *The script will automatically detect this file and load the weights instead of training.*
+
+2.  **Launch Jupyter Lab:**
     ```bash
-    jupyter lab main.ipynb
+    jupyter lab digit_recognizer.ipynb
     ```
 
-2.  **Run the Pipeline:**
+3.  **Run the Pipeline:**
     Execute the notebook cells. The main execution block handles the logic for training versus loading:
 
     ```python
@@ -190,7 +198,7 @@ This project requires Python 3.10 or higher.
     run_pipeline(cnn_model, train_loader, valid_loader, test_loader, device)
     ```
 
-3.  **View Outputs:**
+4.  **View Outputs:**
     The notebook will display:
     * Loss and Accuracy plots.
     * A Confusion Matrix heatmap.
