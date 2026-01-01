@@ -187,7 +187,7 @@ This project requires Python 3.10 or higher.
 
 2.  **Launch Jupyter Lab:**
     ```bash
-    jupyter lab digit_recognizer.ipynb
+    jupyter lab main.ipynb
     ```
 
 3.  **Run the Pipeline:**
