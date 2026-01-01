@@ -62,6 +62,9 @@ The model follows a VGG-style design pattern, stacking convolutional layers with
 |          |                                            |
 |          v                                            |
 | MaxPool2D(k=2)                                        |
+|          |                                            |
+|          v                                            |
+| Dropout2d(p=0.2)                                      |
 +-------------------------------------------------------+
             |
             v (Tensor Shape: 32x14x14)
@@ -76,6 +79,9 @@ The model follows a VGG-style design pattern, stacking convolutional layers with
 |          |                                            |
 |          v                                            |
 | MaxPool2D(k=2)                                        |
+|          |                                            |
+|          v                                            |
+| Dropout2d(p=0.25)                                     |
 +-------------------------------------------------------+
             |
             v (Tensor Shape: 64x7x7)
@@ -87,7 +93,7 @@ The model follows a VGG-style design pattern, stacking convolutional layers with
 | Conv2D(128, k=3) -> BatchNorm -> GELU                 |
 |          |                                            |
 |          v                                            |
-| Dropout                                               |
+| Dropout2d(p=0.3)                                      |
 +-------------------------------------------------------+
             |
             v (Tensor Shape: 128x7x7)
@@ -98,7 +104,7 @@ The model follows a VGG-style design pattern, stacking convolutional layers with
 | Flatten (Input vector size: 128*7*7 = 6272)           |
 |          |                                            |
 |          v                                            |
-| Linear(in=6272, out=512) -> BN -> GELU -> Dropout     |
+| Linear(6272->512) -> BN1d -> GELU -> Dropout(p=0.35)  |
 |          |                                            |
 |          v                                            |
 | Linear(in=512, out=10)                                |
