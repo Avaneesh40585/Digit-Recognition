@@ -1,193 +1,253 @@
 # 🔢 Handwritten Digit Recognition System
 
-An advanced deep learning solution for handwritten digit recognition using **PyTorch**, featuring a robust **CNN architecture**, **data augmentation**, **regularization**, and strong **evaluation metrics**. This project includes both a standard **MNIST pipeline** and a **Kaggle competition-ready workflow**.
+A PyTorch-based Convolutional Neural Network (CNN) for MNIST handwritten digit classification, implementing custom architecture, data augmentation, and regularization techniques.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-1. [About the Dataset](#about-the-dataset)  
-2. [Project Structure](#project-structure)  
-3. [Model Architecture](#model-architecture)  
-4. [Key Features](#key-features)  
-5. [Training Pipeline Overview](#training-pipeline-overview)  
-6. [Requirements](#requirements)  
-7. [Usage](#usage)  
-8. [Results](#results)  
-9. [License](#license)
-10. [Contributing](#contributing)
+1. [About the Dataset](#about-the-dataset)
+2. [Project Structure](#project-structure)
+3. [Model Architecture](#model-architecture)
+4. [Key Features](#key-features)
+5. [Execution Pipeline](#execution-pipeline)
+6. [Setup & Installation](#setup--installation)
+7. [Usage](#usage)
+8. [Contributing](#contributing)
 
 ---
 
-## 📊 About the Dataset
+## About the Dataset
 
-This system is built on the **MNIST Dataset**:
+The system uses the **MNIST Dataset**, which consists of:
+- **60,000** training images (28×28 grayscale)
+- **10,000** test images
+- **10 classes** (digits 0–9)
 
-- **60,000** grayscale images for training (28×28 pixels)  
-- **10,000** images for testing  
-- **10 classes** labeled **0–9**  
-- Images are **pre-centered**, **normalized**, and **automatically downloaded** via `torchvision`  
-- Includes optional **Kaggle support** with submission formatting  
+The dataset is automatically downloaded via `torchvision.datasets`. Images are normalized using the dataset's specific mean and standard deviation.
 
 ---
 
-## 🗂 Project Structure
-```
+## Project Structure
+
+```text
 Digit-Recognition/
-├── .gitignore
-├── requirements.txt
-├── LICENSE
-├── README.md                   # Project documentation (this file)
-├── digit_recognizer.ipynb      # Full MNIST pipeline in PyTorch
-├── Transfer Learning/
-│   ├── digit_recognizer_resnet50.ipynb  # Transfer learning with ResNet50
-│   └── README.md               # Transfer learning documentation
-└── Kaggle Competition/
-    ├── submissions.csv         # Prediction submission file for Kaggle
-    └── digit_recognizer_kaggle.ipynb # Kaggle-compatible training & inference notebook
-```
----
-
-## 🧠 Model Architecture
-```
-Input Image (28x28x1)
-        ↓
-3× [Conv2D + BatchNorm + ReLU]
-   ↳ MaxPool2D, Dropout after each stage
-        ↓
-AdaptiveAvgPool2d (Global)
-        ↓
-Flatten → FC Layer (512) → BatchNorm → ReLU → Dropout
-        ↓
-Output Layer (10 classes - digits 0–9)
-```
----
-
-## 🧠 Model Overview
-
-- **Convolutional Backbone**: Multi-stage feature extraction with 3 convolutional blocks  
-- **Classifier Head**: Adaptive pooling, flattening, and regularized fully connected layers  
-- **Final Output**: 10 logits, one for each digit class  
-
----
-
-## ✨ Key Features
-
-- **Data Augmentation**: Random rotation & translation, enhancing resilience to handwriting variability  
-- **Batch Normalization & Dropout**: Applied in both convolutional and dense layers for stable, regularized training  
-- **Label Smoothing**: Reduces overconfidence, improving model calibration  
-- **Early Stopping**: Prevents overfitting by monitoring validation loss  
-- **Learning Rate Scheduler**: Stepwise adjustments for refined convergence  
-- **Visualization**: Sample images, loss curves, and detailed prediction grids  
-
----
-
-## 🔁 Training Pipeline Overview
-
-### 1. 📂 Data Preparation
-- Downloads and decompresses **MNIST** via `torchvision` (auto-download)  
-- Applies **augmentation** (random rotation, translation, normalization)  
-- Splits data into **training (80%)** and **validation (20%)** sets  
-- `DataLoaders` manage loading for all splits efficiently  
-
-### 2. ⚙️ Model Setup
-- Defines a **CNN** with 3 convolutional blocks, **batch normalization**, and **dropout**  
-- Uses **adaptive average pooling** for resilience to input size changes  
-
-### 3. 🏋️ Training
-- **Adam optimizer** with **cross-entropy loss** (label smoothing enabled)  
-- Best weights saved based on **lowest validation loss**  
-- **Early stopping** to avoid overfitting  
-- **Learning rate** is reduced at milestones for fine-tuning  
-
-### 4. 🧪 Evaluation
-- Reloads **best model** for testing  
-- **Per-class** and **overall accuracy** computed on the test set  
-- Visualizes predictions with **correct/incorrect highlights**  
-
----
-
-## ⚙️ Requirements
-```
-python>=3.8
-torch>=1.9
-torchvision
-numpy
-matplotlib
-seaborn
-pandas
+├── requirements.txt            # Python dependencies
+├── README.md                   # Project documentation
+├── digit_recognizer.ipynb      # Main notebook (Training, Evaluation, Testing)
+├── CNN_best_model.pth          # Saved model weights (generated during training)
+└── data/                       # Dataset storage (created automatically)
 ```
 
-These requirements can be easily installed by: pip install -r requirements.txt
+---
+
+## Model Architecture
+
+The model follows a VGG-style design pattern, stacking convolutional layers with batch normalization and GELU activations before pooling.
+
+**Network Flow:**
+```
++-------------------------+
+| Input Image (1x28x28)   |
++-------------------------+
+            |
+            v
++-------------------------------------------------------+
+| [BLOCK 1: Feature Extraction]                         |
+|                                                       |
+| Conv2D(32, k=3) -> BatchNorm -> GELU                  |
+|          |                                            |
+|          v                                            |
+| Conv2D(32, k=3) -> BatchNorm -> GELU                  |
+|          |                                            |
+|          v                                            |
+| MaxPool2D(k=2)                                        |
++-------------------------------------------------------+
+            |
+            v (Tensor Shape: 32x14x14)
+            |
++-------------------------------------------------------+
+| [BLOCK 2: Deeper Patterns]                            |
+|                                                       |
+| Conv2D(64, k=3) -> BatchNorm -> GELU                  |
+|          |                                            |
+|          v                                            |
+| Conv2D(64, k=3) -> BatchNorm -> GELU                  |
+|          |                                            |
+|          v                                            |
+| MaxPool2D(k=2)                                        |
++-------------------------------------------------------+
+            |
+            v (Tensor Shape: 64x7x7)
+            |
++-------------------------------------------------------+
+| [BLOCK 3: Abstract Concepts]                          |
+| (No pooling here to preserve spatial grid)            |
+|                                                       |
+| Conv2D(128, k=3) -> BatchNorm -> GELU                 |
+|          |                                            |
+|          v                                            |
+| Dropout                                               |
++-------------------------------------------------------+
+            |
+            v (Tensor Shape: 128x7x7)
+            |
++-------------------------------------------------------+
+| [CLASSIFIER HEAD]                                     |
+|                                                       |
+| Flatten (Input vector size: 128*7*7 = 6272)           |
+|          |                                            |
+|          v                                            |
+| Linear(in=6272, out=512) -> BN -> GELU -> Dropout     |
+|          |                                            |
+|          v                                            |
+| Linear(in=512, out=10)                                |
++-------------------------------------------------------+
+            |
+            v
++-------------------------+
+| Final Output (10 Logits)|
++-------------------------+
+```
 
 ---
 
-## 🚀 Usage
+## Key Features
 
-### 1. Run Standard Training
-- Open `digit_recognizer.ipynb` in **Jupyter** or compatible editors.
-  ```
-  cnn_model = CNN()
-  cnn_model.to(device)
-  cnn_loss = trainCNN(cnn_model)
-  ```
-- The best weights are automatically saved as `CNN_model.pth`.
-
-### 2. Visualize Training Progress
-- Loss and accuracy curves, prediction grids, and confusion matrices can be visualized interactively in the notebook.
-  ```
-  plt.plot(cnn_loss['train'], label='Training Loss')
-  plt.plot(cnn_loss['valid'], label='Validation Loss')
-  plt.legend()
-  plt.show()
-  ```
-
-### 3. Testing & Evaluation
-- Evaluation on the test set is performed with detailed accuracy metrics and visual diagnostics.
-  ```
-  cnn_model.load_state_dict(torch.load('CNN_model.pth', map_location=device))
-  testCNN(cnn_model)
-  ```  
-
-### 4. Kaggle Submission
-- Navigate to `Kaggle Competition/digit_recognizer_kaggle.ipynb`, run all cells, and generate `submissions.csv` for Kaggle upload.
+-   **Hardware Acceleration:** Supports both **CUDA** (Linux/Windows) and **MPS** (macOS) for GPU acceleration, falling back to CPU if unavailable.
+-   **Data Augmentation:** Applies random rotations (±10°), translations (±10%), and scaling (90-110%) during training to improve generalization.
+-   **Regularization:** Uses staggered Dropout rates (0.2 to 0.35) and Label Smoothing (0.1) to prevent overfitting.
+-   **Evaluation Setup:** Includes vectorized accuracy metrics, confusion matrix generation, and visual error analysis.
 
 ---
 
-## 📈 Results
+## Execution Pipeline
 
-- **Test Accuracy**: Consistently exceeds **99%** on MNIST  
-- **Per-Class Accuracy**: High accuracy across all digits due to effective augmentation and regularization  
-- **Visualization**: Intuitive grids clearly distinguish correct (**green**) and incorrect (**red**) predictions  
+The code execution process is automated with the following logic:
 
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.  
-See the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-### 💡 Opportunities for Contribution:
-
-- **Ensemble Approaches**: Blend predictions from multiple models for increased robustness  
-- **Adversarial Testing**: Explore model resilience against perturbed samples  
-- **Explainability**: Integrate feature visualization tools   
-- **Advanced Augmentation**: Implement methods like **elastic distortions**, **cutout**, or **mixup**
-
-### 🔧 How to Contribute:
-
-1. Fork the repository  
-2. Create a feature branch  
-   ```bash
-   git checkout -b feature/new-feature
-3.	Make your changes with appropriate documentation and tests
-4.	Submit a pull request with a clear and concise description
+1.  **Model Check:** The script checks for existing weights (`CNN_best_model.pth`).
+    * If found, training is skipped, and weights are loaded.
+    * If not found, the training loop begins.
+2.  **Optimization:**
+    * **Optimizer:** Adam (`lr=1e-3`)
+    * **Scheduler:** StepLR (decays learning rate by 0.5 every 10 epochs)
+    * **Early Stopping:** Stops training if validation loss does not improve for 5 consecutive epochs.
+3.  **Testing:** The best performing model (lowest validation loss) is loaded for final evaluation on the test set.
 
 ---
 
-⭐ If this project helps you, consider giving it a star!
+## Setup & Installation
 
+This project requires Python 3.10 or higher.
+
+### Method 1: Using pip (Standard)
+
+1.  Create and activate a virtual environment:
+    ```bash
+    python -m venv venv
+    # Windows
+    venv\Scripts\activate
+    # macOS/Linux
+    source venv/bin/activate
+    ```
+
+2.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### Method 2: Using uv (Alternative/Recommended)
+
+1. Install uv:
+    ```bash
+    pip install uv
+    ```
+
+2.  Create and activate a virtual environment:
+    ```bash
+    uv venv --python=python3.10
+    source .venv/bin/activate
+    ```
+3. Install dependencies:
+    ```bash
+    uv pip install -r requirements.txt
+    ```
+
+---
+
+## Usage
+
+1.  **Launch Jupyter Lab:**
+    ```bash
+    jupyter lab main.ipynb
+    ```
+
+2.  **Run the Pipeline:**
+    Execute the notebook cells. The main execution block handles the logic for training versus loading:
+
+    ```python
+    # Automatically handles Training vs Loading based on file existence
+    run_pipeline(cnn_model, train_loader, valid_loader, test_loader, device)
+    ```
+
+3.  **View Outputs:**
+    The notebook will display:
+    * Loss and Accuracy plots.
+    * A Confusion Matrix heatmap.
+    * A grid of misclassified images.
+
+---
+
+## Contributing
+
+I welcome contributions! Whether it's optimizing the CNN architecture, adding new augmentation techniques, or improving the visualization, here is how you can help.
+
+### How to Get Started
+
+1.  **Fork the repository**
+    ```bash
+    # Clone your fork
+    git clone [https://github.com/yourusername/Digit-Recognition.git](https://github.com/yourusername/Digit-Recognition.git)
+    cd Digit-Recognition
+    ```
+
+2.  **Create a feature branch**
+    ```bash
+    git checkout -b feature/new-architecture
+    ```
+
+3.  **Make your changes**
+    * **Notebooks:** Ensure `main.ipynb` runs sequentially without errors (`Restart Kernel and Run All Cells`).
+    * **Code Style:** Follow standard Python conventions (PEP 8).
+    * **Validation:** If you change the model, please run the full pipeline and include the new test accuracy in your PR description.
+
+4.  **Commit your changes**
+    ```bash
+    git commit -m "Add elastic distortion to data augmentation"
+    ```
+
+5.  **Push to your fork**
+    ```bash
+    git push origin feature/new-architecture
+    ```
+
+6.  **Open a Pull Request**
+    * Provide a clear description of what you changed.
+    * **Crucial:** If your changes affect model performance, attach a screenshot of the new **Loss/Accuracy plots** or **Confusion Matrix**.
+    * Reference any related issues (e.g., `Closes #42`).
+
+### Bug Reports
+
+* Use GitHub Issues with the **"bug"** label.
+* Include the specific cell where the error occurred.
+* Provide your environment details (OS, PyTorch version, GPU/CPU).
+
+### Feature Requests
+
+* Use GitHub Issues with the **"enhancement"** label.
+* Describe the proposed improvement (e.g., "Implement Quantization for mobile deployment").
+* Explain the potential benefit to the project.
+
+---
+
+Star the repository if you like it. 🌟!

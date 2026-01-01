@@ -1,5 +1,6 @@
 .ipynb_checkpoints/
 .vscode/
-venv/
+.venv/
 .env
 .DS_Store
+CNN_best_model.pth
