@@ -34,7 +34,7 @@ The dataset is automatically downloaded via `torchvision.datasets`. Images are n
 Digit-Recognition/
 ├── requirements.txt            # Python dependencies
 ├── README.md                   # Project documentation
-├── digit_recognizer.ipynb      # Main notebook (Training, Evaluation, Testing)
+├── main.ipynb                  # Main notebook (Training, Evaluation, Testing)
 ├── CNN_best_model.pth          # Saved model weights (generated during training)
 └── data/                       # Dataset storage (created automatically)
 ```
